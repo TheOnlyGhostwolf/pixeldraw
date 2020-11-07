@@ -1,0 +1,18 @@
+{
+  "name": "pixeldraw",
+  "version": "1.0.0",
+  "description": "Place your pixel on the canvas!",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "pixelart"
+  ],
+  "author": "TheOnlyGhostwolf",
+  "license": "MIT",
+  "dependencies": {
+    "discord.js": "^12.4.1",
+    "jimp": "^0.16.1"
+  }
+}

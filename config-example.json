@@ -1,0 +1,19 @@
+{
+    "token": "bottokenlol",
+    "size": {
+        "width": 20,
+        "height": 20
+    },
+    "prefix": "px!",
+    "colors": {
+        "red": "ff0000",
+        "orange": "ff5400",
+        "yellow": "ffff00",
+        "green": "008000",
+        "blue": "0000ff",
+        "indigo": "4b0082",
+        "violet": "ee82ee",
+        "white": "ffffff"
+    },
+    "developer": "494037191975239680"
+}
