@@ -6,11 +6,16 @@ const client = new Discord.Client();
 
 client.on("ready", () => {
     console.log(`Logged in as ${client.user.tag}!`);
+    client.user.setActivity(`with ${config.size.width}x${config.size.height} canvas! | ${config.prefix}help`,`PLAYING`)
 })
 
 function error(err, message) {
     return message.channel.send(new Discord.MessageEmbed().setColor(config.colors.red).setDescription(err).setFooter(`Requested by ${message.author.tag}`, message.author.avatarURL({ dynamic: true }))).catch(e => { message.reply(`I can't send embeds in this channel!`) }).catch(e => { message.author.send(`I can't send messages in that channel!`) }).catch(e => { /*  oof  */ })
 }
+
+client.on("error", e => {
+    console.error(`Something went wrong: ${e}`);
+})
 
 client.on("message", message => {
     if (message.author.bot) return;
@@ -31,8 +36,9 @@ client.on("message", message => {
             .addField(`${config.prefix}add <color> <x> <y>`, `Place your pixel on the canvas. <color> represents color, <x> represents pixel's placement on the "x" axis, <y> - on the "y" axis.`)
             .addField(`${config.prefix}colors`, `See all available colors`)
             .addField(`${config.prefix}show`, `Shows the current canvas`);
+        if (message.author.id == config.developer) embed.addField(`${config.prefix}reset`, `[DEV ONLY] Resets the canvas`)
         
-        return message.channel.send(embed).catch(e => { message.reply(`I can't send embeds in this channel!`) }).catch(e => { message.author.send(`I can't send messages in that channel!`) }).catch(e => { /*  oof  */ });
+        return message.channel.send(embed).catch(e => { error(`I can't send embeds in this channel!`, message) })
     }
 
     if (command == `colors`) {
@@ -47,7 +53,7 @@ client.on("message", message => {
             .setAuthor(`Available colors`, client.user.avatarURL({ dynamic: true }))
             .setDescription(description);
 
-        return message.channel.send(embed).catch(e => { message.reply(`I can't send embeds in this channel!`) }).catch(e => { message.author.send(`I can't send messages in that channel!`) }).catch(e => { /*  oof  */ });
+        return message.channel.send(embed).catch(e => { error(`I can't send embeds in this channel!`, message) });
     }
     if (command == `add`) {
         if (!config.colors.hasOwnProperty(args[0])) return error(`That color doesn't exist!`, message);
@@ -62,7 +68,7 @@ client.on("message", message => {
                     image.setPixelColor(parseInt(config.colors[color]+"ff", 16), x-1, y-1);
                 }
             }
-            image.resize(2000, 2000, Jimp.RESIZE_NEAREST_NEIGHBOR);
+            image.resize(5, 5, Jimp.RESIZE_NEAREST_NEIGHBOR);
             image.write('canvas.png');
             message.reply(`Added your \`${args[0]}\` pixel to x: \`${args[1]}\`, y: \`${args[2]}\`!`, { files: [{ attachment: './canvas.png', name: 'canvas.png' }] }).catch(err => { error(`I couldn't send an attachement! Nevertheless, your pixel was added!`, message); });
         }).catch(e => {
@@ -73,7 +79,7 @@ client.on("message", message => {
                         image.setPixelColor(parseInt(config.colors[color]+"ff", 16), x-1, y-1);
                     }
                 }
-                image.resize(2000, 2000, Jimp.RESIZE_NEAREST_NEIGHBOR);
+                image.resize(5, 5, Jimp.RESIZE_NEAREST_NEIGHBOR);
                 image.write('canvas.png');
                 message.reply(`Added your \`${args[0]}\` pixel to x: \`${args[1]}\`, y: \`${args[2]}\`!`, { files: [{ attachment: './canvas.png', name: 'canvas.png' }] }).catch(err => { error(`I couldn't send an attachement! Nevertheless, your pixel was added!`, message); });
             })
