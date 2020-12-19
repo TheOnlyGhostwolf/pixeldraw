@@ -58,14 +58,14 @@ client.on("message", message => {
     }
 
     if (command == `generate`) {
-        new Jimp(config.size.width, config.size.height, '#FFFFFF', (err, image) => {
+        new Jimp(config.size.height, config.size.width, '#FFFFFF', (err, image) => {
             if (err) return message.reply(`Something went wrong: \`${err}\``);
 
             console.log(config.size);
 
             var i = 0, j = 0;
-            while (i < config.size.width) {
-                while (j < config.size.height) {
+            while (i < config.size.height) {
+                while (j < config.size.width) {
                     var color = Object.values(config.colors)[Math.floor((Math.random() * Object.keys(config.colors).length))];
                     image.setPixelColor(parseInt(color+"ff", 16), i, j);
                     j++;
@@ -74,7 +74,7 @@ client.on("message", message => {
                 j = 0;
             }
 
-            image.resize(2000, 2000, Jimp.RESIZE_NEAREST_NEIGHBOR);
+            image.resize(config.size.height*100, config.size.width*100, Jimp.RESIZE_NEAREST_NEIGHBOR);
             image.write('generated.png');
             return message.reply(`Here's a randomly generated image!`, { files: [{ attachment: './generated.png', name: 'generated.png' }] }).catch(err => { error(`I couldn't send an attachement!`, message); });
         });
@@ -87,24 +87,24 @@ client.on("message", message => {
         if (args[2] <= 0 || args[2] > config.size.width) return error(`<y> must be more than 0 and less or equal to ${config.size.width}`, message);
 
         Jimp.read('canvas.png').then(image => {
-            image.resize(config.size.width, config.size.height, Jimp.RESIZE_NEAREST_NEIGHBOR);
+            image.resize(config.size.height, config.size.width, Jimp.RESIZE_NEAREST_NEIGHBOR);
             for (var color in config.colors) {
                 if (color == args[0].toLowerCase()) {
                     image.setPixelColor(parseInt(config.colors[color]+"ff", 16), x-1, y-1);
                 }
             }
-            image.resize(2000, 2000, Jimp.RESIZE_NEAREST_NEIGHBOR);
+            image.resize(config.size.height * 100, config.size.width * 100, Jimp.RESIZE_NEAREST_NEIGHBOR);
             image.write('canvas.png');
             message.reply(`Added your \`${args[0]}\` pixel to x: \`${args[1]}\`, y: \`${args[2]}\`!`, { files: [{ attachment: './canvas.png', name: 'canvas.png' }] }).catch(err => { error(`I couldn't send an attachement! Nevertheless, your pixel was added!`, message); });
         }).catch(e => {
-            new Jimp(config.size.width, config.size.height, '#FFFFFF', (err, image) => {
+            new Jimp(config.size.height, config.size.width, '#FFFFFF', (err, image) => {
                 if (err) return message.reply(`Something went wrong: ${err}`)
                 for (var color in config.colors) {
                     if (color == args[0].toLowerCase()) {
                         image.setPixelColor(parseInt(config.colors[color]+"ff", 16), x-1, y-1);
                     }
                 }
-                image.resize(2000, 2000, Jimp.RESIZE_NEAREST_NEIGHBOR);
+                image.resize(config.size.height * 100, config.size.width * 100, Jimp.RESIZE_NEAREST_NEIGHBOR);
                 image.write('canvas.png');
                 message.reply(`Added your \`${args[0]}\` pixel to x: \`${args[1]}\`, y: \`${args[2]}\`!`, { files: [{ attachment: './canvas.png', name: 'canvas.png' }] }).catch(err => { error(`I couldn't send an attachement! Nevertheless, your pixel was added!`, message); });
             })
@@ -112,7 +112,7 @@ client.on("message", message => {
     }
     if (command == `reset`) {
         if (message.author.id == config.developer) {
-            new Jimp(2000, 2000, '#FFFFFF', (err, image) => {
+            new Jimp(config.size.height * 100, config.size.width * 100, '#FFFFFF', (err, image) => {
                 image.write('canvas.png');
                 return message.reply(`:ok_hand:`);
             });
