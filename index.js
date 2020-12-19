@@ -35,6 +35,7 @@ client.on("message", message => {
             .setDescription(`This bot is a small experiment made by Ghostwolf.\nPlace your pixels on the canvas using commands and work together on making something big! :D`)
             .addField(`${config.prefix}add <color> <x> <y>`, `Place your pixel on the canvas. <color> represents color, <x> represents pixel's placement on the "x" axis, <y> - on the "y" axis.`)
             .addField(`${config.prefix}colors`, `See all available colors`)
+            .addField(`${config.prefix}generate`, `Generates a random canvas`)
             .addField(`${config.prefix}show`, `Shows the current canvas`);
         if (message.author.id == config.developer) embed.addField(`${config.prefix}reset`, `[DEV ONLY] Resets the canvas`)
         
@@ -55,6 +56,30 @@ client.on("message", message => {
 
         return message.channel.send(embed).catch(e => { error(`I can't send embeds in this channel!`, message) });
     }
+
+    if (command == `generate`) {
+        new Jimp(config.size.width, config.size.height, '#FFFFFF', (err, image) => {
+            if (err) return message.reply(`Something went wrong: \`${err}\``);
+
+            console.log(config.size);
+
+            var i = 0, j = 0;
+            while (i < config.size.width) {
+                while (j < config.size.height) {
+                    var color = Object.values(config.colors)[Math.floor((Math.random() * Object.keys(config.colors).length))];
+                    image.setPixelColor(parseInt(color+"ff", 16), i, j);
+                    j++;
+                }
+                i++;
+                j = 0;
+            }
+
+            image.resize(2000, 2000, Jimp.RESIZE_NEAREST_NEIGHBOR);
+            image.write('generated.png');
+            return message.reply(`Here's a randomly generated image!`, { files: [{ attachment: './generated.png', name: 'generated.png' }] }).catch(err => { error(`I couldn't send an attachement!`, message); });
+        });
+    }
+
     if (command == `add`) {
         if (!config.colors.hasOwnProperty(args[0])) return error(`That color doesn't exist!`, message);
         if (isNaN(Math.round(args[1])) || isNaN(Math.round(args[2]))) return error(`<x> and <y> must be numbers!`, message);
@@ -68,18 +93,18 @@ client.on("message", message => {
                     image.setPixelColor(parseInt(config.colors[color]+"ff", 16), x-1, y-1);
                 }
             }
-            image.resize(5, 5, Jimp.RESIZE_NEAREST_NEIGHBOR);
+            image.resize(2000, 2000, Jimp.RESIZE_NEAREST_NEIGHBOR);
             image.write('canvas.png');
             message.reply(`Added your \`${args[0]}\` pixel to x: \`${args[1]}\`, y: \`${args[2]}\`!`, { files: [{ attachment: './canvas.png', name: 'canvas.png' }] }).catch(err => { error(`I couldn't send an attachement! Nevertheless, your pixel was added!`, message); });
         }).catch(e => {
-            new Jimp(config.size.height, config.size.width, '#FFFFFF', (err, image) => {
+            new Jimp(config.size.width, config.size.height, '#FFFFFF', (err, image) => {
                 if (err) return message.reply(`Something went wrong: ${err}`)
                 for (var color in config.colors) {
                     if (color == args[0].toLowerCase()) {
                         image.setPixelColor(parseInt(config.colors[color]+"ff", 16), x-1, y-1);
                     }
                 }
-                image.resize(5, 5, Jimp.RESIZE_NEAREST_NEIGHBOR);
+                image.resize(2000, 2000, Jimp.RESIZE_NEAREST_NEIGHBOR);
                 image.write('canvas.png');
                 message.reply(`Added your \`${args[0]}\` pixel to x: \`${args[1]}\`, y: \`${args[2]}\`!`, { files: [{ attachment: './canvas.png', name: 'canvas.png' }] }).catch(err => { error(`I couldn't send an attachement! Nevertheless, your pixel was added!`, message); });
             })
